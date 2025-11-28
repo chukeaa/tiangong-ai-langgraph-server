@@ -93,6 +93,7 @@ async function SingleChoice(state: typeof chainState.State) {
 - Avoid extreme terms: Do not include extreme terms like “always” or “never” in the options, as they are easily ruled out by students.
 - Question clarity: The question should be clear and concise, ensuring students can easily understand what is being asked.
 - Knowledge alignment: Do not extend beyond the provided knowledge, strictly base questions only on the information given in the knowledge descriptions, without adding external knowledge or concepts.
+- Formula formatting: If a formula is needed, wrap LaTeX content with a single $ (e.g., $a^2 + b^2 = c^2$); do not use double dollars or other delimiters.
 - Question uniqueness: Do not repeat questions that have been asked before. Review the question history and ensure the new question is different from previous ones.`,
     },
     {
@@ -150,6 +151,7 @@ async function MultipleChoices(state: typeof chainState.State) {
 - Avoid extreme terms: Do not include extreme terms like “always”, "only", "just" or “never” in the options, as they are easily ruled out by students.
 - Question uniqueness: Do not repeat questions that have been asked before. Review the question history and ensure the new question is different from previous ones.
 - Question clarity: The question should be clear and concise, ensuring students can easily understand what is being asked.
+- Formula formatting: If a formula is needed, wrap LaTeX content with a single $ (e.g., $a^2 + b^2 = c^2$); do not use double dollars or other delimiters.
 - Question complexity: Design questions that:
   * Involve multi-step reasoning
   * Require integration of different knowledge areas
