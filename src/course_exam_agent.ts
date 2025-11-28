@@ -317,6 +317,9 @@ function buildQuestionInstruction(params: {
   base.push(
     '整体要求：结合学生背景设计高阶思维问题，确保题干清晰并能拉开成绩分布，避免过于基础的直接记忆题。',
   );
+  base.push(
+    '公式格式要求：如需书写公式，请用单个 $ 包裹 LaTeX 形式（例如 $a^2 + b^2 = c^2$），不要使用双美元符号或其他标记。',
+  );
 
   if (planItem.questionType === 'ShortAnswer') {
     base.push('该题需综合主观论述与必要计算步骤，明确给出评分要点。');
@@ -522,6 +525,7 @@ async function SingleChoice(state: typeof chainState.State) {
 - 选项需互斥且具有迷惑性，确保只有一个正确答案。
 - 难度系数不低于 ${planItem.difficulty}。
 - 在解析中，必须解释正确选项的原因并逐一指出干扰项的误区。
+- 公式格式要求：如需书写公式，请用单个 $ 包裹 LaTeX 形式（例如 $a^2 + b^2 = c^2$），不要使用双美元符号或其他标记。
 `,
     },
   ]);
@@ -582,7 +586,8 @@ async function MultipleChoices(state: typeof chainState.State) {
 - 题干应强调综合分析、比较或推理，避免纯记忆描述。
 - 设置至少两个正确答案，其余选项需要针对性干扰，体现常见混淆点。
 - 难度系数不低于 ${planItem.difficulty}。
-- 解析中先整体说明，再分别阐释每个正确选项和错误选项。`,
+- 解析中先整体说明，再分别阐释每个正确选项和错误选项。
+- 公式格式要求：如需书写公式，请用单个 $ 包裹 LaTeX 形式（例如 $a^2 + b^2 = c^2$），不要使用双美元符号或其他标记。`,
     },
   ]);
 
@@ -634,7 +639,8 @@ async function ShortAnswer(state: typeof chainState.State) {
 - 语言：中文。
 - 题干需包含真实案例或复杂情境，引导学生分析并进行必要的计算或推导。
 - 难度系数不低于 ${planItem.difficulty}。
-- 评分要点需拆分为可量化的子项，包含计算步骤、关键结论与论证逻辑。`,
+- 评分要点需拆分为可量化的子项，包含计算步骤、关键结论与论证逻辑。
+- 公式格式要求：如需书写公式，请用单个 $ 包裹 LaTeX 形式（例如 $a^2 + b^2 = c^2$），不要使用双美元符号或其他标记。`,
     },
   ]);
 
