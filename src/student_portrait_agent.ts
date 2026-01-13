@@ -433,7 +433,7 @@ function formatStudentInfo(info?: StudentInfo): string {
     info.grade ? `年级: ${info.grade}` : null,
     info.major ? `专业: ${info.major}` : null,
     info.major_background ? `专业背景: ${info.major_background}` : null,
-    info.grasp_level ? `自评掌握程度: ${info.grasp_level}` : null,
+    // info.grasp_level ? `自评掌握程度: ${info.grasp_level}` : null,
   ].filter(Boolean);
 
   return parts.length > 0 ? parts.join('； ') : '未提供详细的学生背景。';
@@ -721,13 +721,15 @@ async function assessPerformance(state: typeof chainState.State) {
     const performance_assessment = await structuredLlm.invoke([
       {
         role: 'system',
-        content: `你是一位擅长表现性评价的教学测评专家。请基于提供的作品解析数据，输出最终表现（performance_assessment）结论，并严格遵循给定的 JSON schema。先参考摘要掌握整体评分走向，再用 JSON 证据支撑细节描述。
+        content: `你是一位以证据为中心的表现性评价（performance-based assessment）专家，擅长依据作品解析数据对学生成果进行可追溯、可解释、可量化的评价。你将接收一份作品的结构化解析数据（来自图像解析、OCR、文本抽取、内容识别等），并必须基于这些数据给出最终评价。你的任务是输出一个符合指定 JSON Schema 的 performance_assessment 对象，用于课程最终成绩评定。
 要求：
 1. 对每件作品在“内容质量、思维与创新、表达与呈现、规范与反思”四个维度分别给出 0-100 分的量化评分、等级（A-E）与评语；
 2. 结合证据列出作品亮点、问题、改进行动与支撑证据；
 3. 给出整体总结和面向学生的短期改进行动建议（避免“长期监测”“研究跟进”等表述）；
 4. 严格依据数据，不得编造；
-5. 依据评分等级表计算最终表现的 overall_score（total_score、grade、interpretation），明确综合得分与判定理由。
+5. 表达与呈现只关注“逻辑是否被完整、清晰、可检验地呈现出来”。关注的是：读者能否从图表与结构中还原研究逻辑；关键内容是否齐全且可追踪；信息是否缺失、跳步或断裂。
+ - 识别噪声规则（必须遵守）: 由于数据来自图像解析与OCR：拼写错误、错别字、断词、乱码、标点错位→ 不得作为“表达能力”“规范性”或“专业性”扣分依据。
+6. 依据评分等级表计算最终表现的 overall_score（total_score、grade、interpretation），明确综合得分与判定理由。分数与等级必须严格一致，不得跨区间。
 评分需参考以下等级说明：
 | 等级 | 分数区间 | 特征描述 |
 | --- | --- | --- |
@@ -838,16 +840,16 @@ async function renderMarkdown(state: typeof chainState.State) {
   const result = await structuredLlm.invoke([
     {
       role: 'system',
-   content: `你是一位教学诊断专家，需要把既定的学生画像内容排版为 Markdown。请严格基于输入 JSON，保持事实一致，输出对象 { "markdown": string }。Markdown 必须包含三个部分：
- - “总体概览”：用 2-3 句话概述 portrait.overview 要点，并用自然语言给出两项评分及等级。例如：“过程性评分：85 分（等级 B）；表现性评分：88 分（等级 B）。”同时补充学生的学习目标或阶段性意向（若输入可支持），并给出基于事实的简短肯定性描述（如坚持、改进意愿、优势表现等，不可臆测）。不要在文本中出现任何字段名或路径（如 process_assessment.score.total_score、performance_assessment.overall_score 等），不要出现“=”“:”这类程序化标注。若某项数据缺失，仅写“未提供”。
- - “成绩与解读”：围绕过程考查与最终表现的关键结论/问题方向进行分点说明，覆盖掌握度、稳定性、迁移度等主要维度以及最终表现亮点或风险。不要描述“依据/证据来源/数据来源/字段名/schema”等元信息，只呈现客观结论与必要的事实描述。
-  - “下一步建议”：整合 process_assessment.next_steps（priorities、recommended_practices）与 process_assessment.communication_notes，去重后按逻辑分组列出，聚焦学生可立即执行的有限任务与学习策略；禁止出现任何括注或方法性说明（如“按紧急与带动效应排序”“建议按……进行”），仅输出具体建议与要点。若信息缺失，仅写“未提供”。
- 其他约束：
+   content: `你是一位教学诊断专家，需要把既定的学生画像内容排版为 Markdown。请严格基于输入 JSON，保持事实一致。Markdown 必须包含三个部分：
+    (1) “总体概览”：请基于提供的过程考查与最终表现结论，提炼一句概括学生当前水平、一句指出关键优势、一句强调优先改进方向，共 2-3 句话，并用自然语言给出两项评分及等级。例如：“过程性评分：85 分（等级 B）；表现性评分：88 分（等级 B）。” 不要在文本中出现任何字段名或路径（如 process_assessment.score.total_score、performance_assessment.overall_score 等），不要出现“=”“:”这类程序化标注。若某项数据缺失，仅写“未提供”。
+    (2)“成绩与解读”：围绕过程考查与最终表现的关键结论/问题方向进行分点说明，覆盖掌握度、稳定性、迁移度等主要维度以及最终表现亮点或风险。不要描述“依据/证据来源/数据来源/字段名/schema”等元信息，只呈现客观结论与必要的事实描述。
+    (3)“下一步建议”：整合 process_assessment.next_steps（priorities、recommended_practices）与 process_assessment.communication_notes，去重后按逻辑分组列出，聚焦学生可立即执行的有限任务与学习策略；禁止出现任何括注或方法性说明（如“按紧急与带动效应排序”“建议按……进行”），输出具体建议与要点。若信息缺失，仅写“未提供”。
+其他约束：
  - 输出必须为有效的 Markdown 格式，包含标题、列表等结构化元素，便于阅读与理解；
  - 严禁输出任何内部变量名、字段路径或 schema 名称；
  - 不要使用“依据来源”“证据来源”“输入数据未提供XXX”之类表述；缺失项统一写“未提供”；
  - 禁止新增或删除事实，仅可为可读性进行轻微润色（包括去除括号内的排序/方法说明等元语句）；
-  - 语气客观、中性，允许在事实支撑下作简短肯定性表述；读者为学生，避免“监控指标与常规动作”“长期监测与研究跟进”等表述；
+ - 语气客观、中性，允许在事实支撑下作简短肯定性表述；读者为学生，避免“监控指标与常规动作”“长期监测与研究跟进”等表述；
  - 避免使用“子节点”“母节点”等术语，如需表达层级关系，用“知识点”“主题”“分项”等中性表述。`,
     },
     { role: 'human', content: markdownInputPayload },
