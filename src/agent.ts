@@ -5,6 +5,7 @@ import { MessagesAnnotation, StateGraph } from '@langchain/langgraph';
 import { ToolNode } from '@langchain/langgraph/prebuilt';
 
 const tools = [new TavilySearch({ maxResults: 3 })];
+const openai_chat_model_mini = process.env.OPENAI_CHAT_MODEL_MINI ?? '';
 
 // Define the function that calls the model
 async function callModel(state: typeof MessagesAnnotation.State) {
@@ -13,7 +14,7 @@ async function callModel(state: typeof MessagesAnnotation.State) {
    * Feel free to customize the prompt, model, and other logic!
    */
   const model = new ChatOpenAI({
-    model: 'gpt-4o',
+    model: openai_chat_model_mini,
   }).bindTools(tools);
 
   const response = await model.invoke([
