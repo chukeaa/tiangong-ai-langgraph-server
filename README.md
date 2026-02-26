@@ -10,22 +10,65 @@ nvm alias default 20
 nvm use
 
 npm install
-# Update npm packages
-npm update && npm ci
 ```
 
-## Start server
+## Self deployment with Docker (LangGraph + LangSmith tracing)
+
+Official references:
+- https://docs.langchain.com/langgraph-platform/application-structure
+- https://docs.langchain.com/langsmith/deploy-standalone-server
+- https://docs.langchain.com/langsmith/trace-with-langgraph
+
+### 1) Prepare env file
 
 ```bash
-
-# Windows & Linux
-sudo pip install -U --break-system-packages langgraph-cli
-
-# Mac Only
-brew install langgraph-cli
-
-sudo langgraph up
+cp .env.self-hosted.example .env
 ```
+
+Fill required secrets in `.env`, at least:
+- `OPENAI_API_KEY`
+- `OPENAI_CHAT_MODEL`
+- `OPENAI_CHAT_MODEL_MINI`
+- `LANGSMITH_API_KEY` (for tracing)
+
+Enable LangSmith logging:
+- `LANGSMITH_TRACING=true`
+- `LANGSMITH_PROJECT=tiangong-ai-langgraph-server`
+- `LANGSMITH_ENDPOINT=https://api.smith.langchain.com` (default SaaS endpoint)
+
+### 2) Build LangGraph API image
+
+```bash
+npx @langchain/langgraph-cli@latest build -t tiangong-langgraph-server:local
+```
+
+### 3) Start services
+
+```bash
+docker compose -f docker-compose.self-hosted.yml up -d
+```
+
+If you need local Neo4j in the same stack:
+
+```bash
+docker compose -f docker-compose.self-hosted.yml --profile neo4j up -d
+```
+
+### 4) Verify server
+
+```bash
+curl http://localhost:8123/ok
+```
+
+Open LangSmith and check traces under your `LANGSMITH_PROJECT`.
+
+## Local development server
+
+```bash
+npx @langchain/langgraph-cli@latest dev
+```
+
+## Background scripts (optional)
 
 ```bash
 nohup node dist/multi_agents/kg_textbooks.js > kg_textbook.log 2>&1 &

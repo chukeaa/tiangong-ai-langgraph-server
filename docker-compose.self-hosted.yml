@@ -1,0 +1,63 @@
+services:
+  langgraph-redis:
+    image: redis:6
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - langgraph-redis-data:/data
+
+  langgraph-postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - langgraph-postgres-data:/var/lib/postgresql/data
+
+  langgraph-api:
+    image: ${LANGGRAPH_IMAGE:-tiangong-langgraph-server:local}
+    restart: unless-stopped
+    ports:
+      - "8123:8000"
+    env_file:
+      - ${APP_ENV_FILE:-.env}
+    environment:
+      REDIS_URI: ${REDIS_URI:-redis://langgraph-redis:6379}
+      DATABASE_URI: ${DATABASE_URI:-postgres://postgres:postgres@langgraph-postgres:5432/postgres?sslmode=disable}
+    depends_on:
+      langgraph-redis:
+        condition: service_healthy
+      langgraph-postgres:
+        condition: service_healthy
+
+  neo4j:
+    image: neo4j:5.25.1-enterprise
+    profiles: ["neo4j"]
+    restart: unless-stopped
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      - NEO4J_dbms.security.allow_csv_import_from_file_urls=true
+      - NEO4J_dbms.directories.import=/import
+      - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/neo4j}
+    volumes:
+      - ./neo4j_docker/neo4j/conf:/var/lib/neo4j/conf
+      - ./neo4j_docker/neo4j/import:/import
+      - ./neo4j_docker/neo4j/plugins:/plugins
+
+volumes:
+  langgraph-postgres-data:
+  langgraph-redis-data:

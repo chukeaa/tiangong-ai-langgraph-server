@@ -1,10 +1,47 @@
-### Get assistant
-curl --request GET \
-  --url {{$dotenv RAG_ASSISTANT_URL }}\
-  --header 'X-Api-Key: {{$dotenv LANGSMITH_API_KEY}}'
+@baseUrl = http://localhost:8123
 
-### Get assistant graph
-curl --request GET \
-  --url {{$dotenv RAG_ASSISTANT_URL }}/graph \
-  --header 'X-Api-Key: {{$dotenv LANGSMITH_API_KEY}}'
+### Health Check
+GET {{baseUrl}}/ok
 
+### One-click local quiz_agent smoke test
+POST {{baseUrl}}/runs/wait
+Content-Type: application/json
+
+{
+  "assistant_id": "quiz_agent",
+  "input": {
+    "knowledge_content": "体积混合比是某组分摩尔数与空气总摩尔数之比，单位通常为ppm、ppb、ppt，当空气密度变化时保持恒定。",
+    "knowledge_point_name": "体积混合比定义",
+    "sample_questions": [
+      "问题： 单选题）下列哪种浓度表示方法在空气被压缩或膨胀时保持不变？A. 数浓度 B. 质量浓度 C. 体积混合比 D. 分压 答案：C",
+      "问题： （判断题）质量混合比与体积混合比在数值上总是相等的。 答案：错误",
+      "问题：计算题）若CO₂的体积混合比为400 ppm，求其在标准大气压(1013 hPa)和25°C条件下的数浓度(molecules/cm³)。 答案：n = (P/RT)×N_A×χ = (101300/(8.314×298))×6.022×10²³×400×10⁻⁶ ≈ 9.76×10¹⁵ molecules/cm³"
+    ],
+    "user_context": {
+      "grade": "博士1年级",
+      "grasp_level": "完全不懂",
+      "history": [
+        ""
+      ],
+      "major": "经济学",
+      "major_background": "不具备任何环境领域经验"
+    }
+  }
+}
+
+
+### One-click local rag_agent smoke test
+POST {{baseUrl}}/runs/wait
+Content-Type: application/json
+
+{
+  "assistant_id": "rag_agent",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "有哪些和锂电池环境影响评价有关的SCI论文？"
+      }
+    ]
+  }
+}
