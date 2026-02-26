@@ -9,6 +9,7 @@
     "@langchain/core": "^1.1.28",
     "@langchain/langgraph": "^1.1.5",
     "@langchain/openai": "^1.2.10",
+    "@langchain/tavily": "^1.2.0",
     "@tiangong-lca/tidas-sdk": "^0.1.21",
     "axios": "^1.9.0",
     "form-data": "^4.0.4",
