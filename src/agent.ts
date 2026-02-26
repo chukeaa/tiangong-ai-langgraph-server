@@ -1,11 +1,10 @@
-import { TavilySearchResults } from '@langchain/community/tools/tavily_search';
-import type { AIMessage } from '@langchain/core/messages';
+import { TavilySearch } from '@langchain/tavily';
 import { ChatOpenAI } from '@langchain/openai';
 
 import { MessagesAnnotation, StateGraph } from '@langchain/langgraph';
 import { ToolNode } from '@langchain/langgraph/prebuilt';
 
-const tools = [new TavilySearchResults({ maxResults: 3 })];
+const tools = [new TavilySearch({ maxResults: 3 })];
 
 // Define the function that calls the model
 async function callModel(state: typeof MessagesAnnotation.State) {
@@ -32,7 +31,7 @@ async function callModel(state: typeof MessagesAnnotation.State) {
 // Define the function that determines whether to continue or not
 function routeModelOutput(state: typeof MessagesAnnotation.State) {
   const messages = state.messages;
-  const lastMessage: AIMessage = messages[messages.length - 1];
+  const lastMessage = messages[messages.length - 1] as { tool_calls?: unknown[] } | undefined;
   // If the LLM is invoking tools, route there.
   if ((lastMessage?.tool_calls?.length ?? 0) > 0) {
     return 'tools';

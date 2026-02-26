@@ -1,4 +1,4 @@
-import { AIMessage, BaseMessage } from '@langchain/core/messages';
+import { BaseMessage } from '@langchain/core/messages';
 import { ChatOpenAI } from '@langchain/openai';
 
 import { Annotation, Command, StateGraph } from '@langchain/langgraph';
@@ -118,7 +118,7 @@ ${state.suggestion !== '' ? `*** Suggestions ***  ${state.suggestion}` : ''}`,
 async function evaluateAnswer(state: typeof StateAnnotation.State) {
   console.log('--- evaluateOutput ---');
   // console.log(state.messages);
-  const firstMessage: AIMessage = state.messages[0];
+  const firstMessage = state.messages[0];
   const answer: string = state.answers[state.answers.length - 1];
   console.log('---- answer ----');
   console.log(answer);

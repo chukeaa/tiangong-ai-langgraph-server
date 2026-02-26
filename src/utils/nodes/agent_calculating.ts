@@ -1,4 +1,4 @@
-import { AIMessage, BaseMessage } from '@langchain/core/messages';
+import { BaseMessage } from '@langchain/core/messages';
 import { ChatOpenAI } from '@langchain/openai';
 
 import { Annotation, StateGraph } from '@langchain/langgraph';
@@ -113,9 +113,9 @@ ${state.suggestion !== '' ? `*** Suggestions ***  ${state.suggestion}` : ''}`,
 function routeModelOutput(state: typeof StateAnnotation.State) {
   console.log('------ routeModelOutput ------');
   const messages = state.messages;
-  const lastMessage: AIMessage = messages[messages.length - 1];
+  const lastMessage = messages[messages.length - 1] as { tool_calls?: unknown[] } | undefined;
   // console.log(lastMessage);
-  if (lastMessage.tool_calls?.length) {
+  if (lastMessage?.tool_calls?.length) {
     return 'tools';
   }
   return '__end__';

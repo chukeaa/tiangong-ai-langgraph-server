@@ -1,5 +1,4 @@
-import { TavilySearchResults } from '@langchain/community/tools/tavily_search';
-import type { AIMessage } from '@langchain/core/messages';
+import { TavilySearch } from '@langchain/tavily';
 import { ChatOpenAI } from '@langchain/openai';
 
 import { Annotation, MessagesAnnotation, StateGraph } from '@langchain/langgraph';
@@ -11,7 +10,7 @@ const OutputStateAnnotation = Annotation.Root({
   last_content: Annotation<string[]>(),
 });
 
-const tools = [new TavilySearchResults({ maxResults: 5 })];
+const tools = [new TavilySearch({ maxResults: 5 })];
 
 // const email = process.env.EMAIL ?? '';
 // const password = process.env.PASSWORD ?? '';
@@ -42,7 +41,7 @@ async function callModel(state: typeof InternalStateAnnotation.State) {
 // Define the function that determines whether to continue or not
 function routeModelOutput(state: typeof InternalStateAnnotation.State) {
   const messages = state.messages;
-  const lastMessage: AIMessage = messages[messages.length - 1];
+  const lastMessage = messages[messages.length - 1] as { tool_calls?: unknown[] } | undefined;
   // If the LLM is invoking tools, route there.
   if ((lastMessage?.tool_calls?.length ?? 0) > 0) {
     return 'tools';
