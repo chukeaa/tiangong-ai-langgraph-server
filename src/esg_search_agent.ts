@@ -5,6 +5,9 @@ import { Annotation, MessagesAnnotation, StateGraph } from '@langchain/langgraph
 import { ToolNode } from '@langchain/langgraph/prebuilt';
 import { z } from 'zod';
 
+const openai_api_key = process.env.OPENAI_API_KEY ?? '';
+const openai_chat_model = process.env.OPENAI_CHAT_MODEL ?? '';
+
 const InternalStateAnnotation = MessagesAnnotation;
 const OutputStateAnnotation = Annotation.Root({
   last_content: Annotation<string[]>(),
@@ -21,7 +24,8 @@ const tools = [new TavilySearch({ maxResults: 5 })];
 // Define the function that calls the model
 async function callModel(state: typeof InternalStateAnnotation.State) {
   const model = new ChatOpenAI({
-    model: 'gpt-4o-mini',
+    model: openai_chat_model,
+    apiKey: openai_api_key,
   }).bindTools(tools);
 
   // console.log(state.messages);
@@ -52,7 +56,8 @@ function routeModelOutput(state: typeof InternalStateAnnotation.State) {
 
 async function outputModel(state: typeof InternalStateAnnotation.State) {
   const model = new ChatOpenAI({
-    model: 'gpt-4o-mini',
+    model: openai_chat_model,
+    apiKey: openai_api_key,
   });
 
   const ResponseFormatter = z.object({
