@@ -43,7 +43,7 @@ async function callModel(state: typeof StateAnnotation.State) {
     apiKey: openai_api_key,
     modelName: openai_chat_model,
     temperature: 0,
-    streaming: true,
+    streaming: false,
   }).bindTools(tools);
 
   const messages = state.messages;
@@ -130,7 +130,7 @@ async function gradeContents(
     apiKey: openai_api_key,
     modelName: openai_chat_model,
     temperature: 0,
-    streaming: true,
+    streaming: false,
   }).bindTools([tool], {
     tool_choice: tool.name,
   });
@@ -207,7 +207,7 @@ async function supplementContents(state: typeof StateAnnotation.State) {
     apiKey: openai_api_key,
     modelName: openai_chat_model,
     temperature: 0,
-    streaming: true,
+    streaming: false,
   }).bindTools(tools);
   // const chain = prompt.pipe(model);
   const response = await prompt.pipe(model).invoke({ context: query, suggestion: suggestion });
@@ -251,7 +251,7 @@ async function generate(
     apiKey: openai_api_key,
     modelName: openai_chat_model,
     temperature: 0,
-    streaming: true,
+    streaming: false,
   });
 
   const ragChain = prompt.pipe(model);
@@ -304,7 +304,7 @@ async function suggestion(
     apiKey: openai_api_key,
     modelName: openai_chat_model,
     temperature: 0,
-    streaming: true,
+    streaming: false,
   }).bindTools([tool], {
     tool_choice: tool.name,
   });
@@ -370,7 +370,7 @@ async function regenerate(
     apiKey: openai_api_key,
     modelName: openai_chat_model,
     temperature: 0,
-    streaming: true,
+    streaming: false,
   });
 
   const ragChain = prompt.pipe(model);

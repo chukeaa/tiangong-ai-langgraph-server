@@ -91,7 +91,7 @@ async function generateKG(state: typeof MessagesAnnotation.State) {
     apiKey: openai_api_key,
     modelName: openai_chat_model,
     temperature: 0,
-    streaming: true,
+    streaming: false,
   }).bindTools([tool]);
 
   const chain = prompt.pipe(model);
