@@ -7,8 +7,8 @@ import { basename } from 'node:path';
 import { z } from 'zod';
 
 const openai_api_key = process.env.OPENAI_API_KEY ?? '';
-const openai_chat_model =  process.env.OPENAI_CHAT_MODEL_REASONNING ?? '';
-const openai_chat_model_mini = process.env.OPENAI_CHAT_MODEL_REASONNING_MINI ?? '';
+const openai_chat_model =  process.env.OPENAI_CHAT_MODEL_REASONING ?? '';
+const openai_chat_model_mini = process.env.OPENAI_CHAT_MODEL_MINI ?? '';
 const mineru_base_url = process.env.MINERU_BASE_URL ?? '';
 const mineru_api_key = process.env.MINERU_API_KEY ?? '';
 const mineru_vision_provider = process.env.MINERU_VISION_PROVIDER ?? '';

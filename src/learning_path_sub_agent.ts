@@ -81,7 +81,9 @@ async function getGraphData(state: typeof chainState.State) {
    - Limit results to concrete characteristics rather than applications or management approaches
    - Keep the most critical and specific sub-properties
 3. Node Representation:
-   - Use concise and specific terms for nodes (e.g., "力的分解" instead of "力的分解概念")
+   - Output each node as a slightly detailed Chinese phrase (not just a short keyword), using parenthesis style like "主题名（关键说明）".
+   - Do not use colon forms such as "：" or ":" in node text.
+   - Keep each node concise but informative; avoid overly long sentences.
    - Avoid abstract terms like "knowledge modules" in the node names
    - Output Format: Use **Chinese language** for key related node names.
    `,

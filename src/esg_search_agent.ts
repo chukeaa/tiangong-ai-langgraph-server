@@ -1,17 +1,19 @@
-import { TavilySearchResults } from '@langchain/community/tools/tavily_search';
-import type { AIMessage } from '@langchain/core/messages';
+import { TavilySearch } from '@langchain/tavily';
 import { ChatOpenAI } from '@langchain/openai';
 
 import { Annotation, MessagesAnnotation, StateGraph } from '@langchain/langgraph';
 import { ToolNode } from '@langchain/langgraph/prebuilt';
 import { z } from 'zod';
 
+const openai_api_key = process.env.OPENAI_API_KEY ?? '';
+const openai_chat_model_mini = process.env.OPENAI_CHAT_MODEL_MINI ?? '';
+
 const InternalStateAnnotation = MessagesAnnotation;
 const OutputStateAnnotation = Annotation.Root({
   last_content: Annotation<string[]>(),
 });
 
-const tools = [new TavilySearchResults({ maxResults: 5 })];
+const tools = [new TavilySearch({ maxResults: 5 })];
 
 // const email = process.env.EMAIL ?? '';
 // const password = process.env.PASSWORD ?? '';
@@ -22,7 +24,8 @@ const tools = [new TavilySearchResults({ maxResults: 5 })];
 // Define the function that calls the model
 async function callModel(state: typeof InternalStateAnnotation.State) {
   const model = new ChatOpenAI({
-    model: 'gpt-4o-mini',
+    model: openai_chat_model_mini,
+    apiKey: openai_api_key,
   }).bindTools(tools);
 
   // console.log(state.messages);
@@ -42,7 +45,7 @@ async function callModel(state: typeof InternalStateAnnotation.State) {
 // Define the function that determines whether to continue or not
 function routeModelOutput(state: typeof InternalStateAnnotation.State) {
   const messages = state.messages;
-  const lastMessage: AIMessage = messages[messages.length - 1];
+  const lastMessage = messages[messages.length - 1] as { tool_calls?: unknown[] } | undefined;
   // If the LLM is invoking tools, route there.
   if ((lastMessage?.tool_calls?.length ?? 0) > 0) {
     return 'tools';
@@ -53,7 +56,8 @@ function routeModelOutput(state: typeof InternalStateAnnotation.State) {
 
 async function outputModel(state: typeof InternalStateAnnotation.State) {
   const model = new ChatOpenAI({
-    model: 'gpt-4o-mini',
+    model: openai_chat_model_mini,
+    apiKey: openai_api_key,
   });
 
   const ResponseFormatter = z.object({

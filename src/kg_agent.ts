@@ -1,4 +1,3 @@
-import { AIMessage } from '@langchain/core/messages';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { MessagesAnnotation, StateGraph } from '@langchain/langgraph';
 import { ChatOpenAI } from '@langchain/openai';
@@ -50,7 +49,7 @@ const responseSchema = z
 
 async function generateKG(state: typeof MessagesAnnotation.State) {
   const messages = state.messages;
-  const lastMessage: AIMessage = messages[messages.length - 1];
+  const lastMessage = messages[messages.length - 1];
   const { context, topic, textbook } = JSON.parse(lastMessage.content as string);
 
   const tool = {
@@ -92,7 +91,7 @@ async function generateKG(state: typeof MessagesAnnotation.State) {
     apiKey: openai_api_key,
     modelName: openai_chat_model,
     temperature: 0,
-    streaming: true,
+    streaming: false,
   }).bindTools([tool]);
 
   const chain = prompt.pipe(model);
@@ -101,7 +100,7 @@ async function generateKG(state: typeof MessagesAnnotation.State) {
     context: context,
     topic: topic,
     textbook: textbook,
-  })) as AIMessage;
+  }));
 
   return {
     messages: response,
