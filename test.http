@@ -1,11 +1,16 @@
 @baseUrl = http://localhost:8123
+@apiKey = change-this-key-before-production
 
-### Health Check
+### Nginx Health Check
 GET {{baseUrl}}/ok
+
+### Langgraph Health Check
+GET {{baseUrl}}/healthz
 
 ### One-click local quiz_agent smoke test
 POST {{baseUrl}}/runs/wait
 Content-Type: application/json
+X-API-Key: {{apiKey}}
 
 {
   "assistant_id": "quiz_agent",
@@ -33,6 +38,7 @@ Content-Type: application/json
 ### One-click local rag_agent smoke test
 POST {{baseUrl}}/runs/wait
 Content-Type: application/json
+X-API-Key: {{apiKey}}
 
 {
   "assistant_id": "rag_agent",

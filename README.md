@@ -42,7 +42,19 @@ Enable LangSmith logging:
 npx @langchain/langgraph-cli@latest build -t tiangong-langgraph-server:local
 ```
 
-### 3) Start services
+### 3) Configure Nginx API key
+
+Edit `nginx/langgraph-auth-key.conf`:
+
+```nginx
+map $http_x_api_key $langgraph_is_authorized {
+  default 0;
+  "your-strong-api-key" 1;
+  # "your-second-key" 1;
+}
+```
+
+### 4) Start services
 
 ```bash
 docker compose -f docker-compose.self-hosted.yml up -d
@@ -54,10 +66,14 @@ If you need local Neo4j in the same stack:
 docker compose -f docker-compose.self-hosted.yml --profile neo4j up -d
 ```
 
-### 4) Verify server
+### 5) Verify server
 
 ```bash
 curl http://localhost:8123/ok
+# -> should return 401 without key
+
+curl -H "X-API-Key: your-strong-api-key" http://localhost:8123/ok
+# -> should return 200
 ```
 
 Open LangSmith and check traces under your `LANGSMITH_PROJECT`.
