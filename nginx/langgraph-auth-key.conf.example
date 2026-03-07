@@ -1,3 +1,6 @@
+map_hash_bucket_size 128;
+map_hash_max_size 4096;
+
 map $http_x_api_key $langgraph_is_authorized {
   default 0;
   # Replace these keys before production use.
