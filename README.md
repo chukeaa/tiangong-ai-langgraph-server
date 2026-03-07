@@ -44,7 +44,13 @@ npx @langchain/langgraph-cli@latest build -t tiangong-langgraph-server:local
 
 ### 3) Configure Nginx API key
 
-Edit `nginx/langgraph-auth-key.conf`:
+Create local key file from template:
+
+```bash
+cp nginx/langgraph-auth-key.conf.example nginx/langgraph-auth-key.conf
+```
+
+Then edit `nginx/langgraph-auth-key.conf`:
 
 ```nginx
 map $http_x_api_key $langgraph_is_authorized {

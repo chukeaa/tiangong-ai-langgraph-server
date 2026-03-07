@@ -12,3 +12,5 @@ test_data/
 # vscode
 .vscode/
 
+# local secrets
+nginx/langgraph-auth-key.conf
